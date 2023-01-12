@@ -3,7 +3,7 @@ import CustomTable, { CustomTableProps } from '@comps/CustomTable'
 import CustomUpload, { UploadProps } from '@comps/CustomUpload'
 import { ReactNode, useCallback, useState } from 'react'
 
-type CustomTable2Props<TData> = Omit<
+type CustomTable2Props<TData extends Record<string, any> = {}> = Omit<
 	CustomTableProps<TData>,
 	'onUpload' | 'onEdit'
 > & {

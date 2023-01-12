@@ -48,7 +48,7 @@ enum ConfirmTips {
 
 const EXPORT_TO_CSV_TIPS = '导出成功, 请稍后...'
 
-export interface CustomTableProps<TData> {
+export interface CustomTableProps<TData extends Record<string, any> = {}> {
 	columns: MRT_ColumnDef<TData>[]
 	data: TData[]
 	rowCustomActionsSize?: number
@@ -287,6 +287,6 @@ const CustomTable = <TData extends Record<string, any> = {}>({
 	)
 }
 
-export default memo(CustomTable) as <TData>(
+export default memo(CustomTable) as <TData extends Record<string, any> = {}>(
 	props: CustomTableProps<TData>
 ) => JSX.Element

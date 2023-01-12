@@ -27,11 +27,14 @@ type UseChildToParent<T = any> = [
 
 // 子组件传值给父组件
 export const useChildToParent = <T>() => {
-	let parentHook: () => T | null = () => null
+	let callback: () => T
 
 	const childHook = (cb: () => T) => {
-		parentHook = cb
+		callback = cb
 	}
+
+	const parentHook = () => callback()
+
 	return {
 		childHook,
 		parentHook,

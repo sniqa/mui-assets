@@ -1,12 +1,21 @@
 import { Autocomplete, TextField } from '@mui/material'
-import { memo, useEffect } from 'react'
+import { memo, useState } from 'react'
 
 import useSWR, { preload } from 'swr'
 
 import CustomSelect from '@comps/CustomSelect'
+import { DeviceCategory, DeviceKind } from '@lib/deviceBase'
 import { fetchData } from '@lib/fetch'
 import { SWRUniqueKey } from '@lib/swrKey'
-import type { DeviceInfo, DeviceInfoWithId } from '@lib/types'
+import type {
+	DepartmentInfoWithId,
+	DeviceBaseInfoWithId,
+	DeviceInfo,
+	DeviceInfoWithId,
+	IpAddressInfoWithId,
+	NetworkTypeInfoWithId,
+	UserInfoWithId,
+} from '@lib/types'
 
 const getData = async () => {
 	const {
@@ -26,10 +35,15 @@ const getData = async () => {
 	return {
 		userInfos: find_users.success ? find_users.data : [],
 		departmentInfos: find_departments.success ? find_departments.data : [],
-		userInfo: find_users.success ? find_users.data : [],
 		networkTypeInfos: find_network_types.success ? find_network_types.data : [],
 		ipAddressInfos: find_ips.success ? find_ips.data : [],
 		deviceBaseInfos: find_device_bases.success ? find_device_bases.data : [],
+	} as {
+		userInfos: UserInfoWithId[]
+		departmentInfos: DepartmentInfoWithId[]
+		networkTypeInfos: NetworkTypeInfoWithId[]
+		ipAddressInfos: IpAddressInfoWithId[]
+		deviceBaseInfos: DeviceBaseInfoWithId[]
 	}
 }
 
@@ -39,20 +53,42 @@ preload(SWRUniqueKey.DeviceOptions, getData)
 type DeviceConfig = DeviceInfoWithId | DeviceInfo | {}
 
 interface DeviceDetailProps {
-	onChange: React.Dispatch<React.SetStateAction<DeviceConfig>>
+	emitValue: (cb: () => DeviceInfoWithId) => void
 	defaultValue: DeviceInfoWithId | null
+	deviceCategory: DeviceCategory
 }
 
 const optionsDefault = ['']
 
-const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
+const DeviceDetail = ({
+	emitValue,
+	defaultValue,
+	deviceCategory,
+}: DeviceDetailProps) => {
 	console.log('device-detail')
 
-	useEffect(() => {
-		console.log(defaultValue)
+	const [value, setValue] = useState(
+		defaultValue || {
+			_id: '',
+			user: '',
+			device_name: '',
+			serial_number: '',
+			location: '',
+			level_one_network: '', //网络类型
+			level_two_network: '', //网络类型
+			level_three_network: '', //网络类型
+			ip_address: '',
+			mac: '',
+			device_model: '', //设备型号
+			device_kind: DeviceKind.None, //设备种类
+			device_category: deviceCategory, //设备分类
+			system_version: '',
+			disk_sn: '',
+			remark: '',
+		}
+	)
 
-		defaultValue && onChange(defaultValue)
-	}, [defaultValue])
+	emitValue(() => value)
 
 	const { data } = useSWR(SWRUniqueKey.DeviceOptions, getData)
 
@@ -64,9 +100,9 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				sx={{ width: '16rem', mr: '1rem', mb: '1rem' }}
 				defaultValue={defaultValue?.serial_number || ''}
 				onChange={(e) =>
-					onChange((old) => ({
+					setValue((old) => ({
 						...old,
-						serial_number: e.currentTarget.value.trim(),
+						serial_number: e.target.value.trim(),
 					}))
 				}
 			/>
@@ -82,7 +118,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 					optionsDefault
 				}
 				onChange={(e, newValue) => {
-					onChange((old) => ({ ...old, user: newValue || '' }))
+					setValue((old) => ({ ...old, user: newValue || '' }))
 				}}
 			/>
 
@@ -97,7 +133,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				}
 				defaultValue={defaultValue?.location || ''}
 				onChange={(e, newValue) =>
-					onChange((old) => ({ ...old, location: newValue || '' }))
+					setValue((old) => ({ ...old, location: newValue || '' }))
 				}
 			/>
 
@@ -113,7 +149,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				}
 				defaultValue={defaultValue?.level_one_network || ''}
 				onChange={(e, newValue) =>
-					onChange((old) => ({ ...old, level_one_network: newValue || '' }))
+					setValue((old) => ({ ...old, level_one_network: newValue || '' }))
 				}
 			/>
 			<Autocomplete
@@ -128,7 +164,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				}
 				defaultValue={defaultValue?.level_two_network || ''}
 				onChange={(e, newValue) =>
-					onChange((old) => ({ ...old, level_two_network: newValue || '' }))
+					setValue((old) => ({ ...old, level_two_network: newValue || '' }))
 				}
 			/>
 			<Autocomplete
@@ -143,7 +179,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				}
 				defaultValue={defaultValue?.level_three_network || ''}
 				onChange={(e, newValue) =>
-					onChange((old) => ({
+					setValue((old) => ({
 						...old,
 						level_three_network: newValue || '',
 					}))
@@ -158,12 +194,9 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 					data?.ipAddressInfos
 						.filter(
 							(i) =>
-								i.level_one_network ===
-									data.networkTypeInfos.level_one_network &&
-								i.level_two_network ===
-									data.networkTypeInfos.level_two_network &&
-								i.level_three_network ===
-									data.networkTypeInfos.level_three_network &&
+								i.level_one_network === value.level_one_network &&
+								i.level_two_network === value.level_two_network &&
+								i.level_three_network === value.level_three_network &&
 								i.is_used === false
 						)
 						.map((d) => d.ip_address)
@@ -173,7 +206,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				}
 				value={defaultValue?.ip_address || ''}
 				onChange={(value) =>
-					onChange((old) => ({ ...old, ip_address: value.toString() }))
+					setValue((old) => ({ ...old, ip_address: value.toString() }))
 				}
 			/>
 
@@ -183,9 +216,9 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				sx={{ width: '16rem', mr: '1rem', mb: '1rem' }}
 				defaultValue={defaultValue?.mac || ''}
 				onChange={(e) =>
-					onChange((old) => ({
+					setValue((old) => ({
 						...old,
-						ip_address: e.currentTarget.value.trim(),
+						ip_address: e.target.value.trim(),
 					}))
 				}
 			/>
@@ -203,7 +236,7 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				}
 				defaultValue={defaultValue?.device_model || ''}
 				onChange={(e, newValue) =>
-					onChange((old) => ({ ...old, device_model: newValue || '' }))
+					setValue((old) => ({ ...old, device_model: newValue || '' }))
 				}
 			/>
 
@@ -213,9 +246,9 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				sx={{ width: '16rem', mr: '1rem', mb: '1rem' }}
 				defaultValue={defaultValue?.system_version || ''}
 				onChange={(e) =>
-					onChange((old) => ({
+					setValue((old) => ({
 						...old,
-						system_version: e.currentTarget.value.trim(),
+						system_version: e.target.value.trim(),
 					}))
 				}
 			/>
@@ -226,9 +259,9 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				sx={{ width: '16rem', mr: '1rem', mb: '1rem' }}
 				defaultValue={defaultValue?.disk_sn || ''}
 				onChange={(e) =>
-					onChange((old) => ({
+					setValue((old) => ({
 						...old,
-						disk_sn: e.currentTarget.value.trim(),
+						disk_sn: e.target.value.trim(),
 					}))
 				}
 			/>
@@ -241,9 +274,9 @@ const DeviceDetail = ({ onChange, defaultValue }: DeviceDetailProps) => {
 				sx={{ width: '33rem' }}
 				defaultValue={defaultValue?.remark || ''}
 				onChange={(e) =>
-					onChange((old) => ({
+					setValue((old) => ({
 						...old,
-						remark: e.currentTarget.value.trim(),
+						remark: e.target.value.trim(),
 					}))
 				}
 			/>

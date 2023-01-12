@@ -5,8 +5,9 @@ import { fetchData } from '@lib/fetch'
 import { message } from '@lib/MessageContainer'
 import { PathMapEnum } from '@lib/path_map'
 import type { DeviceInfo, DeviceInfoWithId, UserInfoWithId } from '@lib/types'
+import { useChildToParent } from '@lib/utils'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 
@@ -157,7 +158,7 @@ export default function DeviceTable({
 }: DeviceTableProps) {
 	const [value, setValue] = useState(null)
 
-	useMemo(() => console.log(value, 'value'), [value])
+	const { childHook, parentHook } = useChildToParent<DeviceInfoWithId>()
 
 	const { data } = useSWR(deviceCategory, () => getData(deviceCategory))
 
@@ -186,7 +187,7 @@ export default function DeviceTable({
 
 	const handleOnEditSave = useSWRMutation(
 		deviceCategory,
-		async (_key: any, { arg }) => {
+		async (_key: any, { arg }: { arg: DeviceInfoWithId }) => {
 			console.log(arg, 'edit')
 
 			const { modify_device } = await fetchData({ modify_device: arg })
@@ -220,7 +221,11 @@ export default function DeviceTable({
 						action: 'http://localhost:8083/upload',
 					}}
 					renderCustomDialogContent={(currentRow) => (
-						<DeviceDetail defaultValue={currentRow} onChange={setValue} />
+						<DeviceDetail
+							defaultValue={currentRow}
+							emitValue={childHook}
+							deviceCategory={deviceCategory}
+						/>
 					)}
 				/>
 			</div>
