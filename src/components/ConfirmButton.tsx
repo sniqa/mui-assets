@@ -1,35 +1,43 @@
-import PopConfirm, { PopConfirmProps } from '@comps/PopConfirm'
-import { IconButton, Tooltip, Typography } from '@mui/material'
-import { ReactNode } from 'react'
+import PopConfirm, { PopConfirmProps } from "@comps/PopConfirm";
+import { IconButton, Tooltip, Typography } from "@mui/material";
 
 type ConfirmButtonProps = {
-	iconTip?: ReactNode
-	promptMessage?: string
-} & Omit<PopConfirmProps, 'confirmContent'>
+  iconTitle?: ReactNode;
+  promptMessage?: ReactNode;
+  disabled?: boolean;
+} & Omit<PopConfirmProps, "confirmContent">;
+
+import { ReactNode } from "react";
 
 const ConfirmButton = ({
-	iconTip,
-	children,
-	promptMessage,
-	...prop
+  iconTitle,
+  children,
+  promptMessage,
+  disabled,
+  ...prop
 }: ConfirmButtonProps) => {
-	return (
-		<PopConfirm
-			{...prop}
-			confirmContent={
-				<div>
-					<Typography className="">提示</Typography>
-					<Typography className="py-4">{promptMessage}</Typography>
-				</div>
-			}
-		>
-			<Tooltip title={iconTip}>
-				<span>
-					<IconButton>{children}</IconButton>
-				</span>
-			</Tooltip>
-		</PopConfirm>
-	)
-}
+  return (
+    <PopConfirm
+      {...prop}
+      disable={disabled}
+      confirmContent={
+        <>
+          <Typography className="dark:text-gray-50">{`提示`}</Typography>
+          <Typography className="py-2 dark:text-gray-50">
+            {promptMessage}
+          </Typography>
+        </>
+      }
+    >
+      <Tooltip title={iconTitle}>
+        <span className="">
+          <IconButton disabled={disabled} className="">
+            {children}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </PopConfirm>
+  );
+};
 
-export default ConfirmButton
+export default ConfirmButton;

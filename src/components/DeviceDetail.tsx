@@ -1,21 +1,14 @@
 import { Autocomplete, TextField } from '@mui/material'
-import { memo, useState } from 'react'
+import { memo, useEffect, useMemo } from 'react'
 
 import useSWR, { preload } from 'swr'
 
 import CustomSelect from '@comps/CustomSelect'
-import { DeviceCategory, DeviceKind } from '@lib/deviceBase'
 import { fetchData } from '@lib/fetch'
 import { SWRUniqueKey } from '@lib/swrKey'
-import type {
-	DepartmentInfoWithId,
-	DeviceBaseInfoWithId,
-	DeviceInfo,
-	DeviceInfoWithId,
-	IpAddressInfoWithId,
-	NetworkTypeInfoWithId,
-	UserInfoWithId,
-} from '@lib/types'
+import type { DepartmentInfoWithId, DeviceInfo, DeviceInfoWithId, IpAddressInfoWithId, NetworkTypeInfoWithId, UserInfoWithId } from '@lib/types'
+import { useState } from 'react'
+import { DeviceCategory, DeviceKind } from '@lib/deviceBase'
 
 const getData = async () => {
 	const {
@@ -39,56 +32,50 @@ const getData = async () => {
 		ipAddressInfos: find_ips.success ? find_ips.data : [],
 		deviceBaseInfos: find_device_bases.success ? find_device_bases.data : [],
 	} as {
-		userInfos: UserInfoWithId[]
-		departmentInfos: DepartmentInfoWithId[]
-		networkTypeInfos: NetworkTypeInfoWithId[]
-		ipAddressInfos: IpAddressInfoWithId[]
-		deviceBaseInfos: DeviceBaseInfoWithId[]
+		userInfos: UserInfoWithId[],
+		departmentInfos: DepartmentInfoWithId[],
+		networkTypeInfos: NetworkTypeInfoWithId[],
+		ipAddressInfos: IpAddressInfoWithId[],
+		deviceBaseInfos: DeviceInfoWithId[]
 	}
 }
 
 // 预取数据
 preload(SWRUniqueKey.DeviceOptions, getData)
 
-type DeviceConfig = DeviceInfoWithId | DeviceInfo | {}
+type DeviceConfig = DeviceInfoWithId | {}
 
 interface DeviceDetailProps {
-	emitValue: (cb: () => DeviceInfoWithId) => void
+	emitValue: (value: () => DeviceInfoWithId) => void
 	defaultValue: DeviceInfoWithId | null
 	deviceCategory: DeviceCategory
 }
 
 const optionsDefault = ['']
 
-const DeviceDetail = ({
-	emitValue,
-	defaultValue,
-	deviceCategory,
-}: DeviceDetailProps) => {
-	console.log('device-detail')
-
-	const [value, setValue] = useState(
-		defaultValue || {
-			_id: '',
-			user: '',
-			device_name: '',
-			serial_number: '',
-			location: '',
-			level_one_network: '', //网络类型
-			level_two_network: '', //网络类型
-			level_three_network: '', //网络类型
-			ip_address: '',
-			mac: '',
-			device_model: '', //设备型号
-			device_kind: DeviceKind.None, //设备种类
-			device_category: deviceCategory, //设备分类
-			system_version: '',
-			disk_sn: '',
-			remark: '',
-		}
-	)
+const DeviceDetail = ({ emitValue, defaultValue, deviceCategory }: DeviceDetailProps) => {
+	const [value, setValue] = useState<DeviceInfoWithId>(defaultValue || {
+		_id: '',
+		user: '',
+		device_name: '',
+		serial_number: '',
+		location: '',
+		level_one_network: '', //一级网络
+		level_two_network: '', //二级网络
+		level_three_network: '', //三级网络
+		ip_address: '',
+		mac: '',
+		device_model: '', //设备型号
+		device_kind: DeviceKind.None, //设备种类
+		device_category: deviceCategory, //设备分类
+		system_version: '',
+		disk_sn: '',
+		remark: '',
+	})
 
 	emitValue(() => value)
+
+	console.log('device-detail')
 
 	const { data } = useSWR(SWRUniqueKey.DeviceOptions, getData)
 
@@ -194,9 +181,12 @@ const DeviceDetail = ({
 					data?.ipAddressInfos
 						.filter(
 							(i) =>
-								i.level_one_network === value.level_one_network &&
-								i.level_two_network === value.level_two_network &&
-								i.level_three_network === value.level_three_network &&
+								i.level_one_network ===
+									value.level_one_network &&
+								i.level_two_network ===
+									value.level_two_network &&
+								i.level_three_network ===
+									value.level_three_network &&
 								i.is_used === false
 						)
 						.map((d) => d.ip_address)

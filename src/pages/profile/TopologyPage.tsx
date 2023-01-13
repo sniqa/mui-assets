@@ -1,42 +1,38 @@
-import CustomTable from '@comps/CustomTable'
-import CustomUpload from '@comps/CustomUpload'
-import { fetchData } from '@lib/fetch'
-import { message } from '@lib/MessageContainer'
-import { SWRUniqueKey } from '@lib/swrKey'
-import { MRT_ColumnDef } from 'material-react-table'
-import { useCallback, useState } from 'react'
-import useSWR from 'swr'
+import CustomTable from "@comps/CustomTable";
+import CustomUpload from "@comps/CustomUpload";
+import { fetchData } from "@lib/fetch";
+import { SWRUniqueKey } from "@lib/swrKey";
+import { MRT_ColumnDef } from "material-react-table";
+import { useCallback, useState } from "react";
+import useSWR from "swr";
+import { useSnackbar } from "notistack";
 
-const columns: MRT_ColumnDef<any>[] = []
+const columns: MRT_ColumnDef<any>[] = [];
 
 // 获取数据
-const getData = async () => {
-	const { find_topologys } = await fetchData({
-		find_topologys: {},
-	})
-
-	const { success, data, errmsg } = find_topologys
-
-	return success ? data : (message.error(errmsg), undefined)
-}
 
 export default function TopologyPage() {
-	const [openUpload, setOpenUpload] = useState(false)
+  const [openUpload, setOpenUpload] = useState(false);
 
-	const { data } = useSWR(SWRUniqueKey.Topologys, getData)
+  const { enqueueSnackbar } = useSnackbar();
 
-	return (
-		<>
-			<CustomTable
-				columns={columns}
-				data={data}
-				onUpload={useCallback(() => setOpenUpload(true), [])}
-			/>
+  const { data } = useSWR(SWRUniqueKey.Topologys, async () => {
+    const { find_topologys } = await fetchData({
+      find_topologys: {},
+    });
 
-			<CustomUpload
-				open={openUpload}
-				onCancel={useCallback(() => setOpenUpload(false), [])}
-			/>
-		</>
-	)
+    const { success, data, errmsg } = find_topologys;
+
+    return success ? data : (enqueueSnackbar(errmsg), undefined);
+  });
+
+  return (
+    <>
+      <CustomTable
+        columns={columns}
+        data={data}
+        onUpload={useCallback(() => setOpenUpload(true), [])}
+      />
+    </>
+  );
 }

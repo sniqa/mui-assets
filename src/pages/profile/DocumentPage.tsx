@@ -1,44 +1,79 @@
-import CustomTable from '@comps/CustomTable'
-import CustomUpload from '@comps/CustomUpload'
-import { fetchData } from '@lib/fetch'
-import { message } from '@lib/MessageContainer'
-import { SWRUniqueKey } from '@lib/swrKey'
-import { MRT_ColumnDef } from 'material-react-table'
-import { useCallback, useState } from 'react'
-import useSWR from 'swr'
+import { fetchData } from "@lib/fetch";
+import { IconSearch } from "@comps/FontAwesomeSvgs";
+import { Button, IconButton, InputBase, Stack, Tooltip } from "@mui/material";
+import { Path } from "@lib/path_map";
+import ProfileCard from "@comps/ProfileCard";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { HamsterLoading } from "@comps/Loading";
+import { Link } from "react-router-dom";
+import { DocumentInfoWithId } from "@lib/types";
+import useSWR from "swr";
+import { SWRUniqueKey } from "@lib/swrKey";
+import { SCROLLBAR_CLASSNAME } from "@lib/constant";
 
-const columns: MRT_ColumnDef<any>[] = []
+const Document = () => {
+  const [searchText, setSearchText] = useState("");
 
-// 获取数据
-const getData = async () => {
-	const { find_documents } = await fetchData({
-		find_documents: {},
-	})
+  const ref = useRef<HTMLInputElement | null>(null);
 
-	console.log(find_documents)
+  const { data: documents } = useSWR<DocumentInfoWithId[]>(
+    [SWRUniqueKey.Documents, searchText],
+    async () => {
+      const { find_document_fuzzy } = await fetchData({
+        find_document_fuzzy: searchText,
+      });
 
-	const { success, data, errmsg } = find_documents
+      const { success, data, errmsg } = find_document_fuzzy;
 
-	return success ? data : (message.error(errmsg), undefined)
-}
+      return success ? data : [];
+    }
+  );
 
-export default function DocumentPage() {
-	const [openUpload, setOpenUpload] = useState(false)
+  return (
+    <Suspense fallback={<HamsterLoading />}>
+      <div className="flex justify-between items-center border-b h-12  px-4 bg-white">
+        <section>
+          <Link to={Path.DocumentCreate}>
+            <Button variant="contained" disableElevation>{`新建文档`}</Button>
+          </Link>
+        </section>
 
-	const { data } = useSWR(SWRUniqueKey.Documents, getData)
+        <section className="border border-blue-400 rounded flex items-center">
+          <InputBase
+            size={`small`}
+            type={`search`}
+            placeholder={`搜索`}
+            className={`mt-1`}
+            inputRef={ref}
+          />
 
-	return (
-		<>
-			<CustomTable
-				columns={columns}
-				data={data}
-				onUpload={useCallback(() => setOpenUpload(true), [])}
-			/>
+          <Tooltip title={`搜索`}>
+            <IconButton
+              size={`small`}
+              onClick={() => setSearchText(ref.current?.value || "")}
+            >
+              <IconSearch />
+            </IconButton>
+          </Tooltip>
+        </section>
+      </div>
 
-			<CustomUpload
-				open={openUpload}
-				onCancel={useCallback(() => setOpenUpload(false), [])}
-			/>
-		</>
-	)
-}
+      <div
+        className={`flex flex-wrap h-document-content overflow-auto my-2 px-2 ${SCROLLBAR_CLASSNAME}`}
+      >
+        {documents?.map((document) => (
+          <ProfileCard
+            key={document._id}
+            to={document._id}
+            title={document.title}
+            description={document.description}
+            create_timestamp={document.create_timestamp}
+            last_modify_timestamp={document.last_modify_timestamp}
+          />
+        ))}
+      </div>
+    </Suspense>
+  );
+};
+
+export default Document;

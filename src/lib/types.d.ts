@@ -146,3 +146,17 @@ export type LinerInfoWithId = WithId & LinerInfo
 // Tel
 export interface TelInfo {}
 export type TelInfoWithId = WithId & TelInfo
+
+// network level
+export interface NetworkLevelTwo {
+	level_two_network: string;
+	level_three_network: string[];
+  }
+  
+  export interface NetworkLevelInfo {
+	level_one_network: string;
+	child_network: NetworkLevelTwo[];
+  }
+  
+  
+  export type NetworkLevelInfoWithId = WithId & NetworkLevelInfo

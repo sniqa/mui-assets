@@ -1,33 +1,16 @@
-import { Layout } from 'antd'
-import { useState } from 'react'
-
-const { Header, Sider, Content } = Layout
-
 interface MainLayoutProps {
-	leftSide: JSX.Element
-	contentHeader?: JSX.Element
-	content: JSX.Element
+  leftSide: JSX.Element;
+  content: JSX.Element;
 }
 
-const MainLayout = ({ leftSide, contentHeader, content }: MainLayoutProps) => {
-	const [collapsed, setCollapsed] = useState(true)
+const MainLayout = ({ leftSide, content }: MainLayoutProps) => {
+  return (
+    <div className="w-screen h-screen flex">
+      <aside className="box-border">{leftSide}</aside>
 
-	return (
-		<Layout className="w-sreen h-screen">
-			<Sider
-				collapsible
-				collapsed={collapsed}
-				onCollapse={(val) => setCollapsed(val)}
-			>
-				{leftSide}
-			</Sider>
+      <main className="flex-grow box-border bg-gray-200 w-0">{content}</main>
+    </div>
+  );
+};
 
-			<Layout>
-				{contentHeader && <Header>{contentHeader}</Header>}
-				<Content>{content}</Content>
-			</Layout>
-		</Layout>
-	)
-}
-
-export default MainLayout
+export default MainLayout;

@@ -1,10 +1,12 @@
 import {
+	Button,
 	FormControl,
 	InputLabel,
 	MenuItem,
 	Select,
 	SelectProps,
 } from '@mui/material'
+import {ReactNode} from 'react'
 
 export type CustomSelectProps = SelectProps & {
 	// label: string
@@ -13,6 +15,8 @@ export type CustomSelectProps = SelectProps & {
 	// rule?: (val: any) => boolean
 	options?: any[]
 	className?: string
+	action?: ReactNode
+	eableDeleteOption?: boolean
 	// defaultValue?: string
 	// value?: string
 	// disabled?: boolean
@@ -23,6 +27,8 @@ const CustomSelect = ({
 	onChange = () => {},
 	options = [],
 	className,
+	action,
+	eableDeleteOption,
 	...res
 }: // ...res
 CustomSelectProps) => {
@@ -36,10 +42,13 @@ CustomSelectProps) => {
 					onChange={(e) => onChange(String(e.target.value))}
 					size="small"
 				>
+					{action && <MenuItem>{action}</MenuItem>}
+
 					{options.map((option, index) => (
-						<MenuItem key={index} value={option}>
+						<MenuItem key={index} value={option} >
 							{option || ''}
 						</MenuItem>
+							
 					))}
 				</Select>
 			</FormControl>
