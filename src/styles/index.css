@@ -47,3 +47,49 @@ body {
 .w-transition {
   transition: width 0.3s;
 }
+
+.jodit-container {
+  box-sizing: border-box;
+  height: 100% !important;
+}
+.jodit-workplace {
+  height: calc(100vh - 11.5rem) !important;
+}
+
+
+/* 设置滚动条的样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  /*  width: 2px;
+  height: 2px;
+   height: 67px; */
+}
+::scrollbar {
+  width: 6px;
+  height: 6px;
+  /*  width: 2px;
+   height: 2px;
+   height: 67px; */
+}
+/* 滚动槽 */
+::-webkit-scrollbar-track {
+  display: none;
+  /*  -webkit-box-shadow: inset 0 0 3px #b18933;
+   border-radius: 1px; */
+   background: #afb2b2;
+}
+::scrollbar-track {
+  display: none;
+   border-radius: 1px;
+   background: #afb2b2;
+}
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #afb2b2;
+}
+::scrollbar-thumb {
+  border-radius: 10px;
+  background: #afb2b2;
+}

@@ -1,7 +1,4 @@
-import LeftSide from "@comps/leftside/LeftSide";
+import JoditPreview from '@comps/jodit/JoditPreview'
 
-const HomePage = () => {
-  return <div />;
-};
-
-export default HomePage;
+const HomePage = () => <JoditPreview defaultValue={''}></JoditPreview>
+export default HomePage
