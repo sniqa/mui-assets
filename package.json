@@ -6,11 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite build && vite preview"
   },
-  "browserslist": [
-    "Chrome 65"
-  ],
   "dependencies": {
     "@ant-design/charts": "^1.4.2",
     "@emotion/react": "^11.10.5",

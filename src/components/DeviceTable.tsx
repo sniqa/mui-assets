@@ -21,13 +21,12 @@ const columns: MRT_ColumnDef<DeviceInfoWithId>[] = [
 		accessorKey: 'serial_number',
 		// enableClickToCopy: true,
 		header: '序列号',
-		size: 150,
+		
 	},
 	{
 		accessorKey: 'user',
 		// enableClickToCopy: true,
 		header: '使用人',
-		size: 150,
 	},
 	{
 		accessorKey: 'location',

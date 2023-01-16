@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import svgr from 'vite-plugin-svgr'
+import tailwindCSS from 'tailwindcss'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,19 +11,22 @@ export default defineConfig({
 		svgr(),
 		react(),
 		legacy({
-			targets: ['Chrome 70'],
-			renderLegacyChunks: true,
+			targets: ['Chrome 69'],
+			// renderLegacyChunks: true,
 			additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
 			modernPolyfills: [
 				'es.symbol',
 				'es.array.filter',
 				'es.global-this',
-				'esnext.string.match-all',
+				'es.object.from-entries',
+				'web.queue-microtask'
 			],
+			
 		}),
 	],
+	
 	build: {
-		target: ['Chrome 70'],
+		target: ['es2015'],
 	},
 	resolve: {
 		alias: {

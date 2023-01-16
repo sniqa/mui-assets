@@ -16,15 +16,15 @@ const theme = createTheme({
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <StyledEngineProvider injectFirst>
+    {/* <ThemeProvider theme={theme}> */}
+      {/* <StyledEngineProvider injectFirst> */}
         <SnackbarProvider
           maxSnack={3}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
           <App />
         </SnackbarProvider>
-      </StyledEngineProvider>
-    </ThemeProvider>
+      {/* </StyledEngineProvider> */}
+    {/* </ThemeProvider> */}
   </React.StrictMode>
 );

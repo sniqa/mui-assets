@@ -37,12 +37,12 @@ const Document = () => {
 					</Link>
 				</section>
 
-				<section className="border border-blue-400 rounded flex items-center">
+				<section className="border border-blue-400 border-solid px-1 box-border rounded flex items-center">
 					<InputBase
 						size={`small`}
 						type={`search`}
 						placeholder={`搜索`}
-						className={`mt-1`}
+						className={`pt-1 box-border`}
 						inputRef={ref}
 					/>
 

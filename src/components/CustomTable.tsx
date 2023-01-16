@@ -12,8 +12,8 @@ import MaterialReactTable, {
 	MRT_ColumnDef,
 	MRT_Row,
 	MRT_TableInstance,
-} from 'material-react-table'
-import { MRT_Localization_ZH_HANS } from 'material-react-table/locales/zh-Hans'
+	MRT_Localization_ZH_HANS
+} from '@comps/material-react-table'  
 import { memo, ReactNode, useEffect, useState } from 'react'
 
 const TABLE_CONTAINER_HEIGHT = 'calc(100vh - 13rem)'
@@ -121,9 +121,6 @@ const CustomTable = <TData extends Record<string, any> = {}>({
 		}
 	}, [])
 
-	// useEffect(() => {
-	//   rowVirtualizerInstanceRef.current?.scrollToIndex(0);
-	// }, [sorting]);
 
 	return (
 		<>
@@ -138,11 +135,11 @@ const CustomTable = <TData extends Record<string, any> = {}>({
 				enableDensityToggle={false}
 				selectAllMode="all"
 				localization={MRT_Localization_ZH_HANS}
+				columnResizeMode="onChange"
 				positionActionsColumn="last"
 				positionToolbarAlertBanner="bottom"
 				onSortingChange={setSorting}
 				state={{ isLoading, sorting }}
-				// rowVirtualizerInstanceRef={rowVirtualizerInstanceRef}
 				rowVirtualizerProps={{ overscan: 5 }}
 				muiTableHeadRowProps={{
 					sx: { boxShadow: 0 },
